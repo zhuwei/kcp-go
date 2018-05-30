@@ -456,6 +456,17 @@ func (s *UDPSession) SetWriteBuffer(bytes int) error {
 	return errors.New(errInvalidOperation)
 }
 
+// SetWriteBuffer sets the socket write buffer, no effect if it's accepted from Listener
+func (s *UDPSession) WaitSnd() int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.kcp != nil {
+		return s.kcp.WaitSnd()
+	} else {
+		return 0
+	}
+}
+
 // output pipeline entry
 // steps for output data processing:
 // 0. Header extends
